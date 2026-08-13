@@ -13,6 +13,11 @@ body {
   color: #1f2937;
 }
 
+button,
+input {
+  font: inherit;
+}
+
 .todo-app {
   width: min(100%, 520px);
   padding: 32px;

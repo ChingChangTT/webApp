@@ -1,0 +1,14 @@
+{
+  "name": "todo-web-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "dev": "python3 -m http.server 8000"
+  },
+  "dependencies": {
+    "@angular/common": "^22.1.1",
+    "@angular/core": "^22.1.1",
+    "@angular/forms": "^22.1.1"
+  }
+}

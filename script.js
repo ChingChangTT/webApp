@@ -1,72 +1,45 @@
-const taskForm = document.getElementById("taskForm");
-const taskInput = document.getElementById("taskInput");
-const taskList = document.getElementById("taskList");
-const message = document.getElementById("message");
+angular.module("todoApp", [])
+  .controller("TodoController", function () {
+    var vm = this;
 
-let tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
+    vm.taskName = "";
+    vm.message = "";
+    vm.tasks = JSON.parse(localStorage.getItem("tasks") || "[]");
 
-function saveTasks() {
-  localStorage.setItem("tasks", JSON.stringify(tasks));
-}
+    function saveTasks() {
+      localStorage.setItem("tasks", JSON.stringify(vm.tasks));
+    }
 
-function renderTasks() {
-  taskList.replaceChildren();
+    vm.addTask = function () {
+      var trimmedName = vm.taskName.trim();
 
-  tasks.forEach((task) => {
-    const item = document.createElement("li");
-    item.className = `task-item${task.completed ? " completed" : ""}`;
+      if (!trimmedName) {
+        vm.message = "Please enter a task.";
+        return;
+      }
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = task.completed;
-    checkbox.setAttribute("aria-label", `Mark ${task.name} as completed`);
-    checkbox.addEventListener("change", () => toggleTask(task.id));
+      vm.tasks.push({
+        id: (Date.now() + Math.random()).toString(36),
+        name: trimmedName,
+        completed: false,
+      });
 
-    const name = document.createElement("span");
-    name.textContent = task.name;
+      saveTasks();
+      vm.taskName = "";
+      vm.message = "";
+    };
 
-    const deleteButton = document.createElement("button");
-    deleteButton.type = "button";
-    deleteButton.className = "delete-button";
-    deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", () => deleteTask(task.id));
+    vm.toggleTask = function (id) {
+      vm.tasks = vm.tasks.map(function (task) {
+        return task.id === id ? Object.assign({}, task, { completed: !task.completed }) : task;
+      });
+      saveTasks();
+    };
 
-    item.append(checkbox, name, deleteButton);
-    taskList.appendChild(item);
+    vm.deleteTask = function (id) {
+      vm.tasks = vm.tasks.filter(function (task) {
+        return task.id !== id;
+      });
+      saveTasks();
+    };
   });
-}
-
-function toggleTask(id) {
-  tasks = tasks.map((task) =>
-    task.id === id ? { ...task, completed: !task.completed } : task
-  );
-  saveTasks();
-  renderTasks();
-}
-
-function deleteTask(id) {
-  tasks = tasks.filter((task) => task.id !== id);
-  saveTasks();
-  renderTasks();
-}
-
-taskForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  const taskName = taskInput.value.trim();
-
-  if (!taskName) {
-    message.textContent = "Please enter a task.";
-    taskInput.focus();
-    return;
-  }
-
-  tasks.push({ id: crypto.randomUUID(), name: taskName, completed: false });
-  saveTasks();
-  renderTasks();
-
-  taskInput.value = "";
-  message.textContent = "";
-  taskInput.focus();
-});
-
-renderTasks();
