@@ -1,0 +1,10 @@
+{
+  "name": "My To-Do App",
+  "short_name": "Todo",
+  "description": "A simple todo app you can open and install like an app.",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#eef2ff",
+  "theme_color": "#4338ca",
+  "orientation": "portrait"
+}

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App QR</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        font-family: Arial, sans-serif;
+        background: #eef2ff;
+      }
+      .card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        text-align: center;
+        width: min(90vw, 420px);
+      }
+      img {
+        width: min(70vw, 260px);
+        height: auto;
+        display: block;
+        margin: 0 auto 16px;
+      }
+      h1 {
+        margin-bottom: 10px;
+        color: #4338ca;
+      }
+      p {
+        margin: 0;
+        color: #4b5563;
+      }
+      .field {
+        display: flex;
+        gap: 10px;
+        margin: 18px 0 14px;
+      }
+      input {
+        flex: 1;
+        padding: 10px 12px;
+        border: 1px solid #c7d2fe;
+        border-radius: 8px;
+      }
+      button {
+        background: #4f46e5;
+        color: white;
+        border: 0;
+        border-radius: 8px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      .hint {
+        font-size: 13px;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Scan to open the web app</h1>
+      <img id="qrImage" alt="QR code for web app" />
+
+      <div class="field">
+        <input id="appUrl" type="text" value="http://192.168.1.10:8000" placeholder="http://192.168.1.10:8000" />
+        <button id="updateQr" type="button">Update</button>
+      </div>
+
+      <p class="hint">Use your computer's local IP on the same Wi‑Fi, not localhost.</p>
+    </div>
+
+    <script>
+      const urlInput = document.getElementById('appUrl');
+      const qrImage = document.getElementById('qrImage');
+      const updateQr = document.getElementById('updateQr');
+
+      function generateQr() {
+        const url = urlInput.value.trim();
+        if (!url) return;
+        const encoded = encodeURIComponent(url);
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}`;
+      }
+
+      updateQr.addEventListener('click', generateQr);
+      urlInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') generateQr();
+      });
+
+      generateQr();
+    </script>
+  </body>
+</html>

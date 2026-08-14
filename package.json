@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "python3 -m http.server 8000",
-    "dev": "python3 -m http.server 8000"
+    "start": "ng serve --open",
+    "dev": "ng serve",
+    "build": "ng build"
   },
   "dependencies": {
     "@angular/common": "^22.1.1",
@@ -12,6 +13,8 @@
     "@angular/forms": "^22.1.1"
   },
   "devDependencies": {
-    "@angular/build": "^22.1.1"
+    "@angular-devkit/build-angular": "^21.2.21",
+    "@angular/build": "^22.1.4",
+    "@angular/cli": "^22.1.4"
   }
 }
