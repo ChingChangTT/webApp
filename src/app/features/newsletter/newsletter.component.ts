@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <section class="py-16 bg-gradient-to-r from-pink-100 to-pink-50">
+    <section class="py-16 bg-linear-to-r from-pink-100 to-pink-50">
       <div class="max-w-4xl mx-auto px-4">
         <div class="text-center space-y-6">
           <!-- Title -->

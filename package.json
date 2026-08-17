@@ -22,6 +22,9 @@
     "@angular-devkit/build-angular": "^22.1.4",
     "@angular/build": "^22.1.4",
     "@angular/cli": "^22.1.4",
-    "@angular/compiler-cli": "^22.1.2"
+    "@angular/compiler-cli": "^22.1.2",
+    "@tailwindcss/postcss": "^4.1.12",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.12"
   }
 }

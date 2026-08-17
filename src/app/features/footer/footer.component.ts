@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
     <footer class="bg-gray-900 text-gray-300">
       <!-- Main Footer Content -->
       <div class="max-w-7xl mx-auto px-4 py-16">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-8 mb-12">
+        <div class="grid md:grid-cols-5 gap-8 mb-12">
           <!-- Brand Column -->
           <div class="space-y-4">
             <h3 class="text-2xl font-serif font-bold text-white">BEAUTIFO</h3>
@@ -73,7 +73,7 @@ import { CommonModule } from '@angular/common';
         </div>
 
         <!-- Value Propositions -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-8 border-y border-gray-700">
+        <div class="grid md:grid-cols-3 gap-8 py-8 border-y border-gray-700">
           <div class="flex items-center gap-4">
             <span class="text-3xl">🎁</span>
             <div>

@@ -6,9 +6,9 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <section class="hero-section relative overflow-hidden bg-gradient-to-r from-pink-50 to-white py-20">
+    <section class="hero-section relative overflow-hidden bg-linear-to-r from-pink-50 to-white py-20">
       <div class="max-w-7xl mx-auto px-4">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div class="grid sm:grid-cols-2 gap-12 items-center">
           <!-- Left Content -->
           <div class="space-y-6">
             <div class="text-sm font-semibold text-pink-500 uppercase tracking-wider">
@@ -49,7 +49,7 @@ import { CommonModule } from '@angular/common';
 
           <!-- Right Image -->
           <div class="relative h-96 lg:h-full">
-            <div class="absolute inset-0 bg-gradient-to-br from-pink-200 to-pink-100 rounded-3xl"></div>
+            <div class="absolute inset-0 bg-linear-to-br from-pink-200 to-pink-100 rounded-3xl"></div>
             <img 
               src="https://i.pinimg.com/736x/07/9a/16/079a161ed785efc26d2451d8fd3d3451.jpg" 
               alt="Beauty Products"

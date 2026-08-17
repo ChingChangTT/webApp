@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+button {
+  appearance: none;
+  background: transparent !important;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.search-icon-button,
+.search-icon-button:hover,
+.search-icon-button:active,
+.search-icon-button:focus {
+  background: transparent !important;
+  box-shadow: none;
+}

@@ -1,16 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe } from '@angular/common';
 import { map } from 'rxjs/operators';
 import { ProductService } from '../../core/services';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule],
+  imports: [AsyncPipe],
   template: `
     <header class="sticky top-0 z-50 bg-white shadow-md">
       <!-- Top Bar -->
-      <div class="bg-gradient-to-r from-pink-50 to-white border-b border-gray-200">
+      <div class="bg-linear-to-r from-pink-50 to-white border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 py-2 text-center text-sm text-gray-600">
           Free Delivery on Orders Over \$50 | Use Code: BEAUTI20 for 20% Off
         </div>
@@ -18,9 +18,9 @@ import { ProductService } from '../../core/services';
 
       <!-- Main Header -->
       <div class="max-w-7xl mx-auto px-4 py-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-5">
           <!-- Logo -->
-          <div class="flex-shrink-0">
+          <div class="shrink-0">
             <h1 class="text-3xl font-serif font-bold text-gray-900">
               <span class="text-pink-500">BEAUTIFO</span>
             </h1>
@@ -37,30 +37,34 @@ import { ProductService } from '../../core/services';
 
           <!-- Actions -->
           <div class="flex items-center gap-6">
-            <button class="relative text-gray-700 hover:text-pink-500 transition-colors">
+            <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">🔍</span>
               <span class="sr-only">Search</span>
             </button>
 
-            <button class="relative text-gray-700 hover:text-pink-500 transition-colors">
+            <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">♡</span>
-              <span *ngIf="(wishlistCount$ | async) as count" 
-                [hidden]="count === 0"
-                class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {{ count }}
-              </span>
+              @if(wishlistCount$ | async; as count){
+                @if(count > 0){
+                  <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {{ count }}
+                  </span>
+                }
+              }
             </button>
 
-            <button class="relative text-gray-700 hover:text-pink-500 transition-colors">
+            <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">🛒</span>
-              <span *ngIf="(cartCount$ | async) as count" 
-                [hidden]="count === 0"
-                class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {{ count }}
-              </span>
+              @if(cartCount$ | async; as count){
+                @if(count > 0){
+                  <span class="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {{ count }}
+                  </span>
+                }
+              }
             </button>
 
-            <button class="text-gray-700 hover:text-pink-500 transition-colors">
+            <button class="search-icon-button appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">👤</span>
             </button>
           </div>
@@ -100,11 +104,7 @@ import { ProductService } from '../../core/services';
       </nav>
     </header>
   `,
-  styles: [`
-    :host {
-      display: block;
-    }
-  `]
+  styleUrls: ['./header-style.scss']
 })
 export class HeaderComponent implements OnInit {
   cartCount$ = this.productService.cart$.pipe(map(items => items.length));
