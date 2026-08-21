@@ -1,10 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterOutlet } from '@angular/router';
 import { 
   HeaderComponent, 
-  HeroSectionComponent, 
-  ProductGridComponent, 
-  NewsletterComponent, 
   FooterComponent 
 } from '../app/features';
 
@@ -14,17 +12,13 @@ import {
   standalone: true,
   imports: [
     CommonModule,
+    RouterOutlet,
     HeaderComponent,
-    HeroSectionComponent,
-    ProductGridComponent,
-    NewsletterComponent,
     FooterComponent
   ],
   template: `
     <app-header></app-header>
-    <app-hero-section></app-hero-section>
-    <app-product-grid></app-product-grid>
-    <app-newsletter></app-newsletter>
+    <router-outlet></router-outlet>
     <app-footer></app-footer>
   `,
   styles: []

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { ProductService } from '../../core/services';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, RouterLink, RouterLinkActive],
   template: `
     <header class="sticky top-0 z-50 bg-white shadow-md">
       <!-- Top Bar -->
@@ -64,7 +65,7 @@ import { ProductService } from '../../core/services';
               }
             </button>
 
-            <button class="search-icon-button appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
+            <button (click)="profileNavigation()" class="search-icon-button appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">👤</span>
             </button>
           </div>
@@ -84,19 +85,19 @@ import { ProductService } from '../../core/services';
       <nav class="border-t border-gray-200">
         <div class="max-w-7xl mx-auto px-4">
           <div class="flex gap-8">
-            <a href="#" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
+            <a routerLink="/" routerLinkActive="text-pink-500" [routerLinkActiveOptions]="{ exact: true }" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
               Home
             </a>
-            <a href="#" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
+            <a routerLink="/shop" routerLinkActive="text-pink-500" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
               Shop
             </a>
-            <a href="#" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
+            <a routerLink="/categories" routerLinkActive="text-pink-500" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
               Categories
             </a>
-            <a href="#" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
+            <a routerLink="/about" routerLinkActive="text-pink-500" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
               About Us
             </a>
-            <a href="#" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
+            <a routerLink="/contact" routerLinkActive="text-pink-500" class="py-3 text-gray-700 font-medium hover:text-pink-500 transition-colors">
               Contact
             </a>
           </div>
@@ -110,7 +111,13 @@ export class HeaderComponent implements OnInit {
   cartCount$ = this.productService.cart$.pipe(map(items => items.length));
   wishlistCount$ = this.productService.wishlist$.pipe(map(items => items.length));
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService,private routes:Router) {}
 
   ngOnInit(): void {}
+
+  profileNavigation(): Promise<boolean> {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+
+    return this.routes.navigate([isLoggedIn ? '/profile' : '/sign-in']);
+  }
 }
