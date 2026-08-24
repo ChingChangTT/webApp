@@ -13,14 +13,16 @@ export class SignIn {
   loginWithGoogle(): Promise<boolean> {
     const demoUser = {
       id: 'demo-google-user',
-      name: 'Demo User',
+      firstName: 'Ratana',
+      lastName:'Keo',
       email: 'demo@beautifo.com',
-      provider: 'google'
+      sex: 'female',
+      dob:'2005-04-13'
     };
 
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(demoUser));
-
+    console.log("test",demoUser)
     return this.router.navigate(['/profile']);
   }
 }
