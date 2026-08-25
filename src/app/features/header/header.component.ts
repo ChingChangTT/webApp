@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { map } from 'rxjs/operators';
@@ -65,9 +65,43 @@ import { ProductService } from '../../core/services';
               }
             </button>
 
-            <button (click)="profileNavigation()" class="search-icon-button appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
-              <span class="text-2xl">👤</span>
-            </button>
+            <div
+              class="relative"
+              (mouseenter)="isHoverTrue.set(true)"
+              (mouseleave)="isHoverTrue.set(false)"
+            >
+              <button
+                type="button"
+                (click)="profileNavigation()"
+                class="search-icon-button text-gray-700 hover:text-pink-500 transition-colors"
+                aria-label="Open profile"
+              >
+                <span class="text-2xl">👤</span>
+              </button>
+
+              @if (isHoverTrue() && isLoggedIn()) {
+                <div class="absolute right-0 top-full pt-3 z-50">
+                  <div class="w-44 rounded-xl border border-pink-100 bg-white p-2 shadow-xl">
+                    <div class="px-3 py-2 border-b border-gray-100">
+                      <p class="text-xs font-medium uppercase tracking-wider text-gray-400">Account</p>
+                      <p class="mt-0.5 text-sm font-semibold text-gray-800">My profile</p>
+                    </div>
+                    <button
+                      type="button"
+                      (click)="logout()"
+                      class="logout-button mt-1 flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50"
+                      aria-label="Log out of your account"
+                    >
+                      <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                      </svg>
+                      Log out
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+
           </div>
         </div>
 
@@ -110,14 +144,27 @@ import { ProductService } from '../../core/services';
 export class HeaderComponent implements OnInit {
   cartCount$ = this.productService.cart$.pipe(map(items => items.length));
   wishlistCount$ = this.productService.wishlist$.pipe(map(items => items.length));
-
+  protected isHoverTrue=signal<boolean>(false);
+//  isHoverTrue=false;
   constructor(private productService: ProductService,private routes:Router) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // console.log("data",this.isHoverTrue());
+  }
 
   profileNavigation(): Promise<boolean> {
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    return this.routes.navigate([this.isLoggedIn() ? '/profile' : '/sign-in']);
+  }
 
-    return this.routes.navigate([isLoggedIn ? '/profile' : '/sign-in']);
+  isLoggedIn(): boolean {
+    return localStorage.getItem('isLoggedIn') === 'true';
+  }
+
+  logout(): Promise<boolean> {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+    this.isHoverTrue.set(false);
+
+    return this.routes.navigate(['/sign-in']);
   }
 }

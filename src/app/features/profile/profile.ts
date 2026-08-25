@@ -1,6 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { profileUser } from './profile.model';
 import { form, maxLength, pattern, required, FormField } from '@angular/forms/signals';
+import { Router } from '@angular/router';
 
 @Component({
   imports: [FormField],
@@ -10,7 +11,7 @@ import { form, maxLength, pattern, required, FormField } from '@angular/forms/si
 })
 export class Profile {
 
-  constructor() {
+  constructor(private router: Router) {
     const username =localStorage.getItem('currentUser');
     const convertdata  : profileUser | null =username ?  JSON.parse(username) : null
     this.dataLogIn(convertdata);
@@ -39,5 +40,12 @@ export class Profile {
       sex:entity?.sex ?? '',
       dob:new Date(entity?.dob ?? '') ?? null,
     })
+  }
+
+  logout(): Promise<boolean> {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('currentUser');
+
+    return this.router.navigate(['/sign-in']);
   }
 }

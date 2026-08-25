@@ -2,12 +2,19 @@
   display: block;
 }
 
-button {
+.search-icon-button {
   appearance: none;
   background: transparent !important;
   border: none;
   padding: 0;
   cursor: pointer;
+}
+
+.logout-button {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
 }
 
 .search-icon-button,
