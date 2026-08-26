@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { profileUser } from './profile.model';
 import { form, maxLength, pattern, required, FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
+import { UserStore } from '../../core/store/user-store';
 
 @Component({
   imports: [FormField],
@@ -10,12 +11,9 @@ import { Router } from '@angular/router';
   templateUrl: './profile.html',
 })
 export class Profile {
-
+  protected userStore=inject(UserStore);
   constructor(private router: Router) {
-    const username =localStorage.getItem('currentUser');
-    const convertdata  : profileUser | null =username ?  JSON.parse(username) : null
-    this.dataLogIn(convertdata);
-    console.log("User Information",this.dataLogIn(convertdata));
+    this.dataLogIn(this.userStore.userProfile());
   }
   protected loginModel = signal<profileUser>({
     id:'',

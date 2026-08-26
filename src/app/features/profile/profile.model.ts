@@ -5,5 +5,8 @@ export interface profileUser{
   firstName : string;
   lastName: string;
   sex:string;
-  dob:Date;
+  dob:Date | null;
+} 
+export interface AllData{
+  userProfile:profileUser | null
 }

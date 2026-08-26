@@ -1,8 +1,9 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { map } from 'rxjs/operators';
 import { ProductService } from '../../core/services';
+import { UserStore } from '../../core/store/user-store';
 
 @Component({
   selector: 'app-header',
@@ -80,11 +81,11 @@ import { ProductService } from '../../core/services';
               </button>
 
               @if (isHoverTrue() && isLoggedIn()) {
-                <div class="absolute right-0 top-full pt-3 z-50">
+                <div class="absolute left-1/2 top-full -translate-x-1/2 pt-3 z-50">
                   <div class="w-44 rounded-xl border border-pink-100 bg-white p-2 shadow-xl">
                     <div class="px-3 py-2 border-b border-gray-100">
-                      <p class="text-xs font-medium uppercase tracking-wider text-gray-400">Account</p>
-                      <p class="mt-0.5 text-sm font-semibold text-gray-800">My profile</p>
+                      <!-- <p class="text-xs font-medium uppercase tracking-wider text-gray-400">Account</p> -->
+                      <p class="mt-0.5 text-sm font-semibold text-gray-800">{{userStore.userProfile()?.email}}</p>
                     </div>
                     <button
                       type="button"
@@ -145,12 +146,10 @@ export class HeaderComponent implements OnInit {
   cartCount$ = this.productService.cart$.pipe(map(items => items.length));
   wishlistCount$ = this.productService.wishlist$.pipe(map(items => items.length));
   protected isHoverTrue=signal<boolean>(false);
-//  isHoverTrue=false;
+  protected userStore=inject(UserStore);
   constructor(private productService: ProductService,private routes:Router) {}
 
-  ngOnInit(): void {
-    // console.log("data",this.isHoverTrue());
-  }
+  ngOnInit(): void {}
 
   profileNavigation(): Promise<boolean> {
     return this.routes.navigate([this.isLoggedIn() ? '/profile' : '/sign-in']);
