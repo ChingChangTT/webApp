@@ -1,5 +1,45 @@
-:host {
-  display: block;
+:host ::ng-deep .filter-field {
+  width: 100%;
+  .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border: none;
+    }
+    .mat-mdc-text-field-wrapper {
+      border: 1px solid;
+      border-color: var(--mat-form-field-outlined-outline-color, var(--mat-sys-outline));
+      border-radius: 4px;
+    }
+    
+    .mdc-floating-label{
+      width: auto;
+      background-color: white;
+      padding: 0px 12px;
+    }
+    input.mat-mdc-input-element {
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      background: transparent !important;
+    }
+    // Close button
+    .clear-button {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .clear-button:hover,
+    .clear-button:focus,
+    .clear-button:active {
+      background: transparent !important;
+    }
+
+    // Remove the Material ripple background
+    .clear-button .mat-mdc-button-persistent-ripple,
+    .clear-button .mat-ripple {
+      display: none;
+    }
 }
 
 .search-icon-button {
@@ -23,4 +63,8 @@
 .search-icon-button:focus {
   background: transparent !important;
   box-shadow: none;
+}
+.titleNotFound{
+  align-items: center;
+  padding: 200px 0px;
 }

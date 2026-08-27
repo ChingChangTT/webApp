@@ -17,7 +17,8 @@ export class SignIn {
       lastName:'Keo',
       email: 'demo@beautifo.com',
       sex: 'female',
-      dob:'2005-04-13'
+      dob:'2005-04-13',
+      password:'Demo@123'
     };
 
     localStorage.setItem('isLoggedIn', 'true');

@@ -13,7 +13,7 @@ export class ProductService {
   private filteredProductsSubject = new BehaviorSubject<Product[]>(MOCK_PRODUCTS);
   private cartSubject = new BehaviorSubject<Product[]>([]);
   private wishlistSubject = new BehaviorSubject<Product[]>([]);
-
+  private searchQuerySubject =new BehaviorSubject<string>('');
   // Public observables
   public products$: Observable<Product[]> = this.productsSubject.asObservable();
   public selectedCategory$: Observable<Category> = this.selectedCategorySubject.asObservable();
@@ -34,6 +34,27 @@ export class ProductService {
   getProductById(id: string): Product | undefined {
     return this.productsSubject.value.find(p => p.id === id);
   }
+  
+  setSearchQuery(query:string):void{
+    this.searchQuerySubject.next(query.trim().toLocaleLowerCase());
+    this.updateFilteredProducts();
+  }
+
+  private updateFilteredProducts(){
+    const category=this.selectedCategorySubject.value;
+    const query=this.searchQuerySubject.value;
+    const filtered=this.productsSubject.value.filter(product=>{
+      const matchesCategory=category.slug==='all' || product.category.slug === category.slug;
+      const searchableText = [
+        product.name,
+        product.description,
+        product.category.name,
+        ...(product.tags ?? [])
+      ].join(' ').toLowerCase();
+      return matchesCategory && searchableText.includes(query);
+    })
+    this.filteredProductsSubject.next(filtered);
+  }
 
   // Filter products by category
   filterProductsByCategory(category: Category): void {
@@ -42,7 +63,6 @@ export class ProductService {
     const filtered = category.slug === 'all'
       ? this.productsSubject.value
       : this.productsSubject.value.filter(p => p.category.slug === category.slug);
-    
     this.filteredProductsSubject.next(filtered);
   }
 

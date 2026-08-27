@@ -1,14 +1,18 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { ProductService } from '../../core/services';
 import { UserStore } from '../../core/store/user-store';
-
+import { MatDialog } from '@angular/material/dialog';
+import { searchComponent } from './ searchDialogs';
+import { MatIconButton } from '@angular/material/button';
+import { MatIcon } from "@angular/material/icon";
+import { MaterialModule } from '../../../lib/material.module';
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [AsyncPipe, RouterLink, RouterLinkActive],
+  imports: [AsyncPipe, RouterLink, RouterLinkActive, MatIcon, MaterialModule],
   template: `
     <header class="sticky top-0 z-50 bg-white shadow-md">
       <!-- Top Bar -->
@@ -29,21 +33,32 @@ import { UserStore } from '../../core/store/user-store';
           </div>
 
           <!-- Search Bar -->
-          <div class="hidden md:block flex-1 mx-8">
-            <input 
-              type="text" 
-              placeholder="Search products, brands..." 
-              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
-            >
-          </div>
-
+          
+          <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filter-field">
+            <mat-label>Search</mat-label>
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              #searchInput
+              [value]="searchQuery()"
+              placeholder="Code or branch name..."
+              (input)="onSearch($event)"
+              (keyup.enter)="openSearch()"
+            />
+            @if (searchQuery()) {
+              <button
+                matIconSuffix
+                mat-icon-button
+                aria-label="Clear search"
+                class="clear-button"
+                (click)="clearSearch(searchInput)"
+                type="button">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
           <!-- Actions -->
           <div class="flex items-center gap-6">
-            <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
-              <span class="text-2xl">🔍</span>
-              <span class="sr-only">Search</span>
-            </button>
-
             <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">♡</span>
               @if(wishlistCount$ | async; as count){
@@ -147,9 +162,14 @@ export class HeaderComponent implements OnInit {
   wishlistCount$ = this.productService.wishlist$.pipe(map(items => items.length));
   protected isHoverTrue=signal<boolean>(false);
   protected userStore=inject(UserStore);
-  constructor(private productService: ProductService,private routes:Router) {}
+  searchQuery = signal('');
+  constructor(private productService: ProductService,
+    private routes:Router,
+    private dialog: MatDialog) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    
+  }
 
   profileNavigation(): Promise<boolean> {
     return this.routes.navigate([this.isLoggedIn() ? '/profile' : '/sign-in']);
@@ -159,6 +179,36 @@ export class HeaderComponent implements OnInit {
     return localStorage.getItem('isLoggedIn') === 'true';
   }
 
+  onSearch(event: Event): void {
+    const input = (event.target as HTMLInputElement).value;
+    this.productService.setSearchQuery(input);
+  }
+
+  openSearch(): void {
+    this.productService.filteredProducts$
+      .pipe(take(1))
+      .subscribe(products => {
+        const dialogRef = this.dialog.open(searchComponent, {
+          width: 'min(90vw, 560px)',
+          data: { products }
+        });
+        
+        dialogRef.afterClosed().subscribe(product => {
+          console.log("Product",product)
+          if (product) {
+            this.routes.navigate(['/shop'], {
+              queryParams: { product: product.id }
+            });
+          }
+        });
+      });
+  }
+  clearSearch(input: HTMLInputElement): void {
+    input.value = '';
+    this.searchQuery.set('');
+    this.productService.setSearchQuery('');
+    input.focus();
+  }
   logout(): Promise<boolean> {
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('currentUser');
