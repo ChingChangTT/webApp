@@ -25,6 +25,25 @@ app-root {
   min-height: 100vh;
 }
 
+/* Angular Material autocomplete is rendered in the global overlay container. */
+.mat-mdc-autocomplete-panel {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.14) !important;
+}
+
+.mat-mdc-autocomplete-panel .mat-mdc-option {
+  background-color: #ffffff;
+  color: #1f2937;
+}
+
+.mat-mdc-autocomplete-panel .mat-mdc-option:hover,
+.mat-mdc-autocomplete-panel .mat-mdc-option.mdc-list-item--selected {
+  background-color: #fdf2f8 !important;
+}
+
 /* Typography Scales */
 h1,
 h2,

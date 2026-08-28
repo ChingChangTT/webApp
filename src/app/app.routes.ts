@@ -36,5 +36,15 @@ export const routes: Routes = [
     title: 'Profile | BEAUTIFO',
     loadComponent: () => import('./features/profile/profile').then(m => m.Profile)
   },
+  {
+    path: 'favorites',
+    title: 'Favorites | BEAUTIFO',
+    loadComponent: () => import('./pages/favorites-page.component').then(m => m.FavoritesPageComponent)
+  },
+  {
+    path: 'cart',
+    title: 'Cart | BEAUTIFO',
+    loadComponent: () => import('./pages/cart-page.component').then(m => m.CartPageComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

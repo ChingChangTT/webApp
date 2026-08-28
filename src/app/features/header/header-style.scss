@@ -10,7 +10,9 @@
       border-color: var(--mat-form-field-outlined-outline-color, var(--mat-sys-outline));
       border-radius: 4px;
     }
-    
+    .mat-mdc-text-field-wrapper:hover{
+      border-color: pink;
+    }
     .mdc-floating-label{
       width: auto;
       background-color: white;
@@ -44,7 +46,7 @@
 
 .search-icon-button {
   appearance: none;
-  background: transparent !important;
+  background-color: transparent !important;
   border: none;
   padding: 0;
   cursor: pointer;

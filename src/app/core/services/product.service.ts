@@ -8,11 +8,13 @@ import { MOCK_PRODUCTS } from '../../shared/data/mock-data';
   providedIn: 'root'
 })
 export class ProductService {
+  private readonly cartStorageKey = 'beautifo-cart';
+  private readonly wishlistStorageKey = 'beautifo-wishlist';
   private productsSubject = new BehaviorSubject<Product[]>(MOCK_PRODUCTS);
   private selectedCategorySubject = new BehaviorSubject<Category>(CATEGORIES[0]);
   private filteredProductsSubject = new BehaviorSubject<Product[]>(MOCK_PRODUCTS);
-  private cartSubject = new BehaviorSubject<Product[]>([]);
-  private wishlistSubject = new BehaviorSubject<Product[]>([]);
+  private cartSubject = new BehaviorSubject<Product[]>(this.readStoredProducts(this.cartStorageKey));
+  private wishlistSubject = new BehaviorSubject<Product[]>(this.readStoredProducts(this.wishlistStorageKey));
   private searchQuerySubject =new BehaviorSubject<string>('');
   // Public observables
   public products$: Observable<Product[]> = this.productsSubject.asObservable();
@@ -23,6 +25,19 @@ export class ProductService {
 
   constructor() {
     this.filterProductsByCategory(CATEGORIES[0]);
+  }
+
+  private readStoredProducts(key: string): Product[] {
+    try {
+      return JSON.parse(localStorage.getItem(key) ?? '[]') as Product[];
+    } catch {
+      localStorage.removeItem(key);
+      return [];
+    }
+  }
+
+  private saveProducts(key: string, products: Product[]): void {
+    localStorage.setItem(key, JSON.stringify(products));
   }
 
   // Get all products
@@ -82,13 +97,16 @@ export class ProductService {
       currentCart.push({ ...product, quantity: 1 });
     }
     
-    this.cartSubject.next([...currentCart]);
+    const updatedCart = [...currentCart];
+    this.cartSubject.next(updatedCart);
+    this.saveProducts(this.cartStorageKey, updatedCart);
   }
 
   // Remove from cart
   removeFromCart(productId: string): void {
     const updatedCart = this.cartSubject.value.filter(p => p.id !== productId);
     this.cartSubject.next(updatedCart);
+    this.saveProducts(this.cartStorageKey, updatedCart);
   }
 
   // Add to wishlist
@@ -96,7 +114,9 @@ export class ProductService {
     const currentWishlist = this.wishlistSubject.value;
     
     if (!currentWishlist.find(p => p.id === product.id)) {
-      this.wishlistSubject.next([...currentWishlist, product]);
+      const updatedWishlist = [...currentWishlist, product];
+      this.wishlistSubject.next(updatedWishlist);
+      this.saveProducts(this.wishlistStorageKey, updatedWishlist);
     }
   }
 
@@ -104,6 +124,7 @@ export class ProductService {
   removeFromWishlist(productId: string): void {
     const updatedWishlist = this.wishlistSubject.value.filter(p => p.id !== productId);
     this.wishlistSubject.next(updatedWishlist);
+    this.saveProducts(this.wishlistStorageKey, updatedWishlist);
   }
 
   // Get cart items count

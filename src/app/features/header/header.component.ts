@@ -1,12 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { map, take } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { ProductService } from '../../core/services';
+import { Product } from '../../core/models';
 import { UserStore } from '../../core/store/user-store';
 import { MatDialog } from '@angular/material/dialog';
-import { searchComponent } from './ searchDialogs';
-import { MatIconButton } from '@angular/material/button';
+import { AccountItemsDialogComponent, AccountItemsDialogMode } from './account-items-dialog.component';
 import { MatIcon } from "@angular/material/icon";
 import { MaterialModule } from '../../../lib/material.module';
 @Component({
@@ -33,7 +33,6 @@ import { MaterialModule } from '../../../lib/material.module';
           </div>
 
           <!-- Search Bar -->
-          
           <mat-form-field appearance="outline" subscriptSizing="dynamic" class="filter-field">
             <mat-label>Search</mat-label>
             <mat-icon matPrefix>search</mat-icon>
@@ -41,9 +40,9 @@ import { MaterialModule } from '../../../lib/material.module';
               matInput
               #searchInput
               [value]="searchQuery()"
-              placeholder="Code or branch name..."
+              placeholder="Search products..."
               (input)="onSearch($event)"
-              (keyup.enter)="openSearch()"
+              [matAutocomplete]="searchResults"
             />
             @if (searchQuery()) {
               <button
@@ -57,9 +56,38 @@ import { MaterialModule } from '../../../lib/material.module';
               </button>
             }
           </mat-form-field>
+          <mat-autocomplete
+            #searchResults="matAutocomplete"
+            [displayWith]="displayProductName"
+            (optionSelected)="selectSearchProduct($event.option.value)"
+          >
+            @if (searchQuery()) {
+              @for (product of filteredProducts$ | async; track product.id) {
+                <mat-option [value]="product">
+                  <div class="flex items-center gap-3 py-2">
+                    <img
+                      [src]="product.image"
+                      [alt]="product.name"
+                      class="h-10 w-10 rounded object-cover"
+                    />
+                    <span>
+                      <strong class="block">{{ product.name }}</strong>
+                      <small class="text-gray-500">\${{ product.price }}</small>
+                    </span>
+                  </div>
+                </mat-option>
+              } @empty {
+                <mat-option disabled>No products match your search.</mat-option>
+              }
+            }
+          </mat-autocomplete>
           <!-- Actions -->
           <div class="flex items-center gap-6">
-            <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
+            <button
+              type="button"
+              (click)="openAccountItems('favorites')"
+              aria-label="View favorite items"
+              class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">♡</span>
               @if(wishlistCount$ | async; as count){
                 @if(count > 0){
@@ -70,7 +98,11 @@ import { MaterialModule } from '../../../lib/material.module';
               }
             </button>
 
-            <button class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
+            <button
+              type="button"
+              (click)="openAccountItems('cart')"
+              aria-label="View cart"
+              class="search-icon-button relative appearance-none bg-transparent border-none p-0 cursor-pointer text-gray-700 hover:text-pink-500 transition-colors">
               <span class="text-2xl">🛒</span>
               @if(cartCount$ | async; as count){
                 @if(count > 0){
@@ -97,11 +129,21 @@ import { MaterialModule } from '../../../lib/material.module';
 
               @if (isHoverTrue() && isLoggedIn()) {
                 <div class="absolute left-1/2 top-full -translate-x-1/2 pt-3 z-50">
-                  <div class="w-44 rounded-xl border border-pink-100 bg-white p-2 shadow-xl">
+                  <div class="w-52 rounded-xl border border-pink-100 bg-white p-2 shadow-xl">
                     <div class="px-3 py-2 border-b border-gray-100">
-                      <!-- <p class="text-xs font-medium uppercase tracking-wider text-gray-400">Account</p> -->
                       <p class="mt-0.5 text-sm font-semibold text-gray-800">{{userStore.userProfile()?.email}}</p>
                     </div>
+                    <a routerLink="/profile" class="mt-1 flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
+                      <span>👤 Profile</span>
+                    </a>
+                    <a routerLink="/favorites" class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
+                      <span>♡ Favorites</span>
+                      <span class="text-xs text-pink-500">{{ wishlistCount$ | async }}</span>
+                    </a>
+                    <a routerLink="/cart" class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
+                      <span>🛒 Cart</span>
+                      <span class="text-xs text-pink-500">{{ cartCount$ | async }}</span>
+                    </a>
                     <button
                       type="button"
                       (click)="logout()"
@@ -160,6 +202,7 @@ import { MaterialModule } from '../../../lib/material.module';
 export class HeaderComponent implements OnInit {
   cartCount$ = this.productService.cart$.pipe(map(items => items.length));
   wishlistCount$ = this.productService.wishlist$.pipe(map(items => items.length));
+  filteredProducts$ = this.productService.filteredProducts$;
   protected isHoverTrue=signal<boolean>(false);
   protected userStore=inject(UserStore);
   searchQuery = signal('');
@@ -175,33 +218,37 @@ export class HeaderComponent implements OnInit {
     return this.routes.navigate([this.isLoggedIn() ? '/profile' : '/sign-in']);
   }
 
+  openAccountItems(mode: AccountItemsDialogMode): void {
+    if (!this.isLoggedIn()) {
+      this.routes.navigate(['/sign-in']);
+      return;
+    }
+
+    this.dialog.open(AccountItemsDialogComponent, {
+      width: 'min(92vw, 620px)',
+      maxWidth: '92vw',
+      data: { mode }
+    });
+  }
+
   isLoggedIn(): boolean {
     return localStorage.getItem('isLoggedIn') === 'true';
   }
 
   onSearch(event: Event): void {
     const input = (event.target as HTMLInputElement).value;
+    this.searchQuery.set(input);
     this.productService.setSearchQuery(input);
   }
 
-  openSearch(): void {
-    this.productService.filteredProducts$
-      .pipe(take(1))
-      .subscribe(products => {
-        const dialogRef = this.dialog.open(searchComponent, {
-          width: 'min(90vw, 560px)',
-          data: { products }
-        });
-        
-        dialogRef.afterClosed().subscribe(product => {
-          console.log("Product",product)
-          if (product) {
-            this.routes.navigate(['/shop'], {
-              queryParams: { product: product.id }
-            });
-          }
-        });
-      });
+  displayProductName(product: Product | string): string {
+    return typeof product === 'string' ? product : product?.name ?? '';
+  }
+
+  selectSearchProduct(product: Product): void {
+    this.routes.navigate(['/shop'], {
+      queryParams: { product: product.id }
+    });
   }
   clearSearch(input: HTMLInputElement): void {
     input.value = '';
