@@ -46,5 +46,10 @@ export const routes: Routes = [
     title: 'Cart | BEAUTIFO',
     loadComponent: () => import('./pages/cart-page.component').then(m => m.CartPageComponent)
   },
+  {
+    path: 'order-tracking',
+    title: 'Track Order | BEAUTIFO',
+    loadComponent: () => import('./pages/order-tracking-page.component').then(m => m.OrderTrackingPageComponent)
+  },
   { path: '**', redirectTo: '' }
 ];

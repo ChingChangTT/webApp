@@ -87,19 +87,18 @@ export class ProductService {
   }
 
   // Add to cart
-  addToCart(product: Product): void {
+  addToCart(product: Product): boolean {
     const currentCart = this.cartSubject.value;
     const existingProduct = currentCart.find(p => p.id === product.id);
-    
+
     if (existingProduct) {
-      existingProduct.quantity = (existingProduct.quantity || 1) + 1;
-    } else {
-      currentCart.push({ ...product, quantity: 1 });
+      return false;
     }
-    
-    const updatedCart = [...currentCart];
+
+    const updatedCart = [...currentCart, { ...product, quantity: 1 }];
     this.cartSubject.next(updatedCart);
     this.saveProducts(this.cartStorageKey, updatedCart);
+    return true;
   }
 
   // Remove from cart
@@ -109,15 +108,27 @@ export class ProductService {
     this.saveProducts(this.cartStorageKey, updatedCart);
   }
 
+  clearCart(): void {
+    this.cartSubject.next([]);
+    this.saveProducts(this.cartStorageKey, []);
+  }
+
+  getCartItems(): Product[] {
+    return this.cartSubject.value.map(product => ({ ...product }));
+  }
+
   // Add to wishlist
-  addToWishlist(product: Product): void {
+  addToWishlist(product: Product): boolean {
     const currentWishlist = this.wishlistSubject.value;
-    
-    if (!currentWishlist.find(p => p.id === product.id)) {
-      const updatedWishlist = [...currentWishlist, product];
-      this.wishlistSubject.next(updatedWishlist);
-      this.saveProducts(this.wishlistStorageKey, updatedWishlist);
+
+    if (currentWishlist.find(p => p.id === product.id)) {
+      return false;
     }
+
+    const updatedWishlist = [...currentWishlist, product];
+    this.wishlistSubject.next(updatedWishlist);
+    this.saveProducts(this.wishlistStorageKey, updatedWishlist);
+    return true;
   }
 
   // Remove from wishlist

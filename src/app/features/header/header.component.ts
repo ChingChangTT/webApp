@@ -133,7 +133,7 @@ import { MaterialModule } from '../../../lib/material.module';
                     <div class="px-3 py-2 border-b border-gray-100">
                       <p class="mt-0.5 text-sm font-semibold text-gray-800">{{userStore.userProfile()?.email}}</p>
                     </div>
-                    <a routerLink="/profile" class="mt-1 flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
+                    <!-- <a routerLink="/profile" class="mt-1 flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
                       <span>👤 Profile</span>
                     </a>
                     <a routerLink="/favorites" class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
@@ -143,7 +143,7 @@ import { MaterialModule } from '../../../lib/material.module';
                     <a routerLink="/cart" class="flex items-center justify-between rounded-lg px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-pink-50">
                       <span>🛒 Cart</span>
                       <span class="text-xs text-pink-500">{{ cartCount$ | async }}</span>
-                    </a>
+                    </a> -->
                     <button
                       type="button"
                       (click)="logout()"

@@ -1,8 +1,10 @@
 import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { map, take } from 'rxjs/operators';
 import { ProductService } from '../core/services';
+import { CheckoutDialogComponent } from '../shared/components/checkout-dialog.component';
 
 @Component({
   selector: 'app-cart-page',
@@ -28,9 +30,13 @@ import { ProductService } from '../core/services';
                   <button type="button" (click)="productService.removeFromCart(product.id)" class="rounded-lg border border-gray-300 px-4 py-2 text-gray-700">Remove</button>
                 </article>
               }
-              <div class="flex items-center justify-between p-5 text-lg font-bold">
-                <span>Total</span>
-                <span class="text-pink-500">\${{ total$ | async }}</span>
+              <div class="flex items-center justify-between gap-4 p-5">
+                <div class="text-lg font-bold">
+                  <span>Total: </span><span class="text-pink-500">\${{ total$ | async }}</span>
+                </div>
+                <button type="button" (click)="openCheckout()" class="rounded-lg bg-pink-500 px-6 py-3 font-semibold text-white hover:bg-pink-600">
+                  Proceed to payment
+                </button>
               </div>
             </div>
           } @else {
@@ -52,5 +58,16 @@ export class CartPageComponent {
     ).toFixed(2))
   );
 
-  constructor(public productService: ProductService) {}
+  constructor(public productService: ProductService, private dialog: MatDialog) {}
+
+  openCheckout(): void {
+    this.total$.pipe(take(1)).subscribe(total => {
+      this.dialog.open(CheckoutDialogComponent, {
+        width: 'min(92vw, 520px)',
+        maxWidth: '92vw',
+        maxHeight: 'calc(100dvh - 2rem)',
+        data: { total }
+      });
+    });
+  }
 }

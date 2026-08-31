@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ProductCardComponent } from '../product-card/product-card.component';
 import { ProductService } from '../../core/services';
 import { Product, Category, CATEGORIES } from '../../core/models';
+import { MatDialog } from '@angular/material/dialog';
+import { DuplicateItemDialogComponent } from '../../shared/components/duplicate-item-dialog.component';
 
 @Component({
   selector: 'app-product-grid',
@@ -64,7 +66,7 @@ export class ProductGridComponent implements OnInit {
   selectedCategory$ = this.productService.selectedCategory$;
   filteredProducts$ = this.productService.filteredProducts$;
 
-  constructor(private productService: ProductService) {}
+  constructor(private productService: ProductService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.categories = this.productService.getCategories();
@@ -75,13 +77,22 @@ export class ProductGridComponent implements OnInit {
   }
 
   onAddToCart(product: Product): void {
-    this.productService.addToCart(product);
-    // Show toast notification (optional enhancement)
-    console.log('Added to cart:', product.name);
+    if (!this.productService.addToCart(product)) {
+      this.showDuplicateDialog(product, 'cart');
+    }
   }
 
   onAddToWishlist(product: Product): void {
-    this.productService.addToWishlist(product);
-    console.log('Added to wishlist:', product.name);
+    if (!this.productService.addToWishlist(product)) {
+      this.showDuplicateDialog(product, 'favorites');
+    }
+  }
+
+  private showDuplicateDialog(product: Product, destination: 'cart' | 'favorites'): void {
+    this.dialog.open(DuplicateItemDialogComponent, {
+      width: 'min(90vw, 420px)',
+      maxWidth: '90vw',
+      data: { productName: product.name, destination }
+    });
   }
 }

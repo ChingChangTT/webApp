@@ -1,11 +1,13 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, take } from 'rxjs/operators';
 import { MaterialModule } from '../../../lib/material.module';
 import { Product } from '../../core/models';
 import { ProductService } from '../../core/services';
+import { DuplicateItemDialogComponent } from '../../shared/components/duplicate-item-dialog.component';
+import { CheckoutDialogComponent } from '../../shared/components/checkout-dialog.component';
 
 export type AccountItemsDialogMode = 'favorites' | 'cart';
 
@@ -64,14 +66,17 @@ export type AccountItemsDialogMode = 'favorites' | 'cart';
       </div>
 
       <div class="flex items-center justify-between border-t border-gray-100 px-5 py-4">
-        @if (data.mode === 'cart') {
+        @if (data.mode === 'cart' && (items$ | async)?.length) {
           <strong>Total: <span class="text-pink-500">\${{ total$ | async }}</span></strong>
+          <button type="button" (click)="openCheckout()" class="rounded-lg bg-pink-500 px-4 py-2 text-sm font-semibold text-white">
+            Pay now
+          </button>
         } @else {
           <span></span>
         }
-        <button type="button" (click)="openFullPage()" class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white">
+        <!-- <button type="button" (click)="openFullPage()" class="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white">
           View full {{ data.mode === 'favorites' ? 'favorites' : 'cart' }}
-        </button>
+        </button> -->
       </div>
     </div>
   `,
@@ -82,6 +87,7 @@ export class AccountItemsDialogComponent {
   readonly dialogRef = inject(MatDialogRef<AccountItemsDialogComponent>);
   private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
   readonly items$ = this.data.mode === 'favorites'
     ? this.productService.wishlist$
@@ -95,8 +101,13 @@ export class AccountItemsDialogComponent {
   );
 
   moveToCart(product: Product): void {
-    this.productService.addToCart(product);
-    this.productService.removeFromWishlist(product.id);
+    if (!this.productService.addToCart(product)) {
+      this.dialog.open(DuplicateItemDialogComponent, {
+        width: 'min(90vw, 420px)',
+        maxWidth: '90vw',
+        data: { productName: product.name, destination: 'cart' }
+      });
+    }
   }
 
   remove(productId: string): void {
@@ -110,5 +121,17 @@ export class AccountItemsDialogComponent {
   openFullPage(): void {
     this.dialogRef.close();
     this.router.navigate([this.data.mode === 'favorites' ? '/favorites' : '/cart']);
+  }
+
+  openCheckout(): void {
+    this.total$.pipe(take(1)).subscribe(total => {
+      this.dialogRef.close();
+      this.dialog.open(CheckoutDialogComponent, {
+        width: 'min(92vw, 520px)',
+        maxWidth: '92vw',
+        maxHeight: 'calc(100dvh - 2rem)',
+        data: { total }
+      });
+    });
   }
 }

@@ -1,7 +1,9 @@
 import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { ProductService } from '../core/services';
+import { DuplicateItemDialogComponent } from '../shared/components/duplicate-item-dialog.component';
 
 @Component({
   selector: 'app-favorites-page',
@@ -42,10 +44,15 @@ import { ProductService } from '../core/services';
   `
 })
 export class FavoritesPageComponent {
-  constructor(public productService: ProductService) {}
+  constructor(public productService: ProductService, private dialog: MatDialog) {}
 
   moveToCart(product: Parameters<ProductService['addToCart']>[0]): void {
-    this.productService.addToCart(product);
-    this.productService.removeFromWishlist(product.id);
+    if (!this.productService.addToCart(product)) {
+      this.dialog.open(DuplicateItemDialogComponent, {
+        width: 'min(90vw, 420px)',
+        maxWidth: '90vw',
+        data: { productName: product.name, destination: 'cart' }
+      });
+    }
   }
 }

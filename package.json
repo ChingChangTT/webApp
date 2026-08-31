@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "ng serve --open",
-    "dev": "ng serve",
-    "build": "ng build"
+    "config": "node scripts/generate-runtime-config.mjs",
+    "start": "npm run config && ng serve --open",
+    "dev": "npm run config && ng serve",
+    "build": "npm run config && ng build"
   },
   "dependencies": {
     "@angular/common": "^22.1.2",
