@@ -1,4 +1,3 @@
-import { Service } from '@angular/core';
 import { AllData, profileUser } from '../../features/profile/profile.model';
 import { signalStore, withComputed, withHooks, withMethods, withState, patchState } from '@ngrx/signals';
 import { setLoaded } from '../../../lib/with-call-state';
@@ -23,6 +22,10 @@ export const UserStore= signalStore (
             }
 
             patchState(store, { userProfile: parsedUser, ...setLoaded});
+        },
+        updateUser(userProfile: profileUser) {
+            localStorage.setItem('currentUser', JSON.stringify(userProfile));
+            patchState(store, { userProfile });
         }
     })),
     withHooks({

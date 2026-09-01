@@ -202,7 +202,7 @@ import { MaterialModule } from '../../../lib/material.module';
 export class HeaderComponent implements OnInit {
   cartCount$ = this.productService.cart$.pipe(map(items => items.length));
   wishlistCount$ = this.productService.wishlist$.pipe(map(items => items.length));
-  filteredProducts$ = this.productService.filteredProducts$;
+  filteredProducts$ = this.productService.searchResults$;
   protected isHoverTrue=signal<boolean>(false);
   protected userStore=inject(UserStore);
   searchQuery = signal('');
@@ -215,7 +215,7 @@ export class HeaderComponent implements OnInit {
   }
 
   profileNavigation(): Promise<boolean> {
-    return this.routes.navigate([this.isLoggedIn() ? '/profile' : '/sign-in']);
+    return this.routes.navigate([this.isLoggedIn() ? '/account/profile' : '/sign-in']);
   }
 
   openAccountItems(mode: AccountItemsDialogMode): void {

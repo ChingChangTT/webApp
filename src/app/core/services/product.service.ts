@@ -13,6 +13,7 @@ export class ProductService {
   private productsSubject = new BehaviorSubject<Product[]>(MOCK_PRODUCTS);
   private selectedCategorySubject = new BehaviorSubject<Category>(CATEGORIES[0]);
   private filteredProductsSubject = new BehaviorSubject<Product[]>(MOCK_PRODUCTS);
+  private searchResultsSubject = new BehaviorSubject<Product[]>([]);
   private cartSubject = new BehaviorSubject<Product[]>(this.readStoredProducts(this.cartStorageKey));
   private wishlistSubject = new BehaviorSubject<Product[]>(this.readStoredProducts(this.wishlistStorageKey));
   private searchQuerySubject =new BehaviorSubject<string>('');
@@ -20,6 +21,7 @@ export class ProductService {
   public products$: Observable<Product[]> = this.productsSubject.asObservable();
   public selectedCategory$: Observable<Category> = this.selectedCategorySubject.asObservable();
   public filteredProducts$: Observable<Product[]> = this.filteredProductsSubject.asObservable();
+  public searchResults$: Observable<Product[]> = this.searchResultsSubject.asObservable();
   public cart$: Observable<Product[]> = this.cartSubject.asObservable();
   public wishlist$: Observable<Product[]> = this.wishlistSubject.asObservable();
 
@@ -50,25 +52,36 @@ export class ProductService {
     return this.productsSubject.value.find(p => p.id === id);
   }
   
-  setSearchQuery(query:string):void{
+  setSearchQuery(query: string): void {
     this.searchQuerySubject.next(query.trim().toLocaleLowerCase());
-    this.updateFilteredProducts();
+    this.updateSearchResults();
   }
 
-  private updateFilteredProducts(){
-    const category=this.selectedCategorySubject.value;
-    const query=this.searchQuerySubject.value;
-    const filtered=this.productsSubject.value.filter(product=>{
-      const matchesCategory=category.slug==='all' || product.category.slug === category.slug;
-      const searchableText = [
-        product.name,
-        product.description,
-        product.category.name,
-        ...(product.tags ?? [])
-      ].join(' ').toLowerCase();
-      return matchesCategory && searchableText.includes(query);
-    })
-    this.filteredProductsSubject.next(filtered);
+  private updateSearchResults(): void {
+    const query = this.searchQuerySubject.value;
+    if (!query) {
+      this.searchResultsSubject.next([]);
+      return;
+    }
+
+    const matchingProducts = this.productsSubject.value.filter(product =>
+      product.name.toLocaleLowerCase().includes(query)
+    );
+    const exactMatches = matchingProducts.filter(product =>
+      product.name.toLocaleLowerCase() === query
+    );
+
+    if (exactMatches.length) {
+      this.searchResultsSubject.next(exactMatches);
+      return;
+    }
+
+    matchingProducts.sort((first, second) => {
+      const firstStartsWith = first.name.toLocaleLowerCase().startsWith(query) ? 0 : 1;
+      const secondStartsWith = second.name.toLocaleLowerCase().startsWith(query) ? 0 : 1;
+      return firstStartsWith - secondStartsWith || first.name.localeCompare(second.name);
+    });
+    this.searchResultsSubject.next(matchingProducts);
   }
 
   // Filter products by category

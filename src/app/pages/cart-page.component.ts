@@ -11,17 +11,17 @@ import { CheckoutDialogComponent } from '../shared/components/checkout-dialog.co
   standalone: true,
   imports: [AsyncPipe, RouterLink],
   template: `
-    <section class="min-h-[60vh] bg-pink-50 py-12">
-      <div class="max-w-4xl mx-auto px-4">
+    <section class="cart-view min-h-[60vh] bg-pink-50">
+      <div class="cart-inner">
         <h1 class="text-3xl font-bold text-gray-900">Your cart</h1>
-        <p class="mt-2 mb-8 text-gray-600">Items you have added to your cart.</p>
+        <p class="cart-subtitle text-gray-600">Items you have added to your cart.</p>
 
         @if (productService.cart$ | async; as products) {
           @if (products.length) {
             <div class="overflow-hidden rounded-xl bg-white shadow-md">
               @for (product of products; track product.id) {
-                <article class="flex items-center gap-4 border-b border-gray-100 p-4">
-                  <img [src]="product.image" [alt]="product.name" class="h-20 w-20 rounded-lg object-cover" />
+                <article class="cart-row flex items-center border-b border-gray-100">
+                  <img [src]="product.image" [alt]="product.name" class="cart-image rounded-lg" />
                   <div class="flex-1">
                     <h2 class="font-semibold text-gray-900">{{ product.name }}</h2>
                     <p class="text-sm text-gray-500">Quantity: {{ product.quantity || 1 }}</p>
@@ -30,7 +30,7 @@ import { CheckoutDialogComponent } from '../shared/components/checkout-dialog.co
                   <button type="button" (click)="productService.removeFromCart(product.id)" class="rounded-lg border border-gray-300 px-4 py-2 text-gray-700">Remove</button>
                 </article>
               }
-              <div class="flex items-center justify-between gap-4 p-5">
+              <div class="cart-summary flex items-center justify-between">
                 <div class="text-lg font-bold">
                   <span>Total: </span><span class="text-pink-500">\${{ total$ | async }}</span>
                 </div>
@@ -48,7 +48,20 @@ import { CheckoutDialogComponent } from '../shared/components/checkout-dialog.co
         }
       </div>
     </section>
-  `
+  `,
+  styles: [`
+    .cart-view { padding: 2rem; }
+    .cart-inner { width: 100%; }
+    .cart-subtitle { margin-top: 0.5rem; margin-bottom: 2rem; }
+    .cart-row { gap: 1rem; padding: 1rem; }
+    .cart-image { display: block; width: 5rem; height: 5rem; flex: 0 0 5rem; object-fit: cover; }
+    .cart-summary { gap: 1rem; padding: 1.25rem; }
+    @media (max-width: 640px) {
+      .cart-view { padding: 1.25rem; }
+      .cart-row { align-items: flex-start; flex-wrap: wrap; }
+      .cart-summary { align-items: stretch; flex-direction: column; }
+    }
+  `]
 })
 export class CartPageComponent {
   readonly total$ = this.productService.cart$.pipe(

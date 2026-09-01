@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { UserStore } from '../../core/store/user-store';
 
 @Component({
   imports: [],
@@ -8,6 +9,7 @@ import { Router } from '@angular/router';
   templateUrl: './sign-in.html',
 })
 export class SignIn {
+  private readonly userStore = inject(UserStore);
   constructor(private router: Router) {}
 
   loginWithGoogle(): Promise<boolean> {
@@ -23,7 +25,7 @@ export class SignIn {
 
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(demoUser));
-    console.log("test",demoUser)
-    return this.router.navigate(['/profile']);
+    this.userStore.loadUser();
+    return this.router.navigate(['/account/profile']);
   }
 }

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -32,20 +33,19 @@ export const routes: Routes = [
     loadComponent: () => import('./features/sign-in/sign-in').then(m => m.SignIn)
   },
   {
-    path: 'profile',
-    title: 'Profile | BEAUTIFO',
-    loadComponent: () => import('./features/profile/profile').then(m => m.Profile)
+    path: 'account',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/account/account-layout.component').then(m => m.AccountLayoutComponent),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'profile' },
+      { path: 'profile', title: 'Profile | BEAUTIFO', loadComponent: () => import('./features/profile/profile').then(m => m.Profile) },
+      { path: 'favorites', title: 'Favorites | BEAUTIFO', loadComponent: () => import('./pages/favorites-page.component').then(m => m.FavoritesPageComponent) },
+      { path: 'cart', title: 'Cart | BEAUTIFO', loadComponent: () => import('./pages/cart-page.component').then(m => m.CartPageComponent) }
+    ]
   },
-  {
-    path: 'favorites',
-    title: 'Favorites | BEAUTIFO',
-    loadComponent: () => import('./pages/favorites-page.component').then(m => m.FavoritesPageComponent)
-  },
-  {
-    path: 'cart',
-    title: 'Cart | BEAUTIFO',
-    loadComponent: () => import('./pages/cart-page.component').then(m => m.CartPageComponent)
-  },
+  { path: 'profile', redirectTo: 'account/profile' },
+  { path: 'favorites', redirectTo: 'account/favorites' },
+  { path: 'cart', redirectTo: 'account/cart' },
   {
     path: 'order-tracking',
     title: 'Track Order | BEAUTIFO',

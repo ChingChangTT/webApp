@@ -10,21 +10,21 @@ import { DuplicateItemDialogComponent } from '../shared/components/duplicate-ite
   standalone: true,
   imports: [AsyncPipe, RouterLink],
   template: `
-    <section class="min-h-[60vh] bg-pink-50 py-12">
-      <div class="max-w-7xl mx-auto px-4">
+    <section class="favorites-view min-h-[60vh] bg-pink-50">
+      <div class="favorites-inner">
         <h1 class="text-3xl font-bold text-gray-900">Favorite items</h1>
-        <p class="mt-2 mb-8 text-gray-600">Products you saved for later.</p>
+        <p class="favorites-subtitle text-gray-600">Products you saved for later.</p>
 
         @if (productService.wishlist$ | async; as products) {
           @if (products.length) {
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="favorites-grid">
               @for (product of products; track product.id) {
-                <article class="overflow-hidden rounded-xl bg-white shadow-md">
-                  <img [src]="product.image" [alt]="product.name" class="h-56 w-full object-cover" />
-                  <div class="p-5">
+                <article class="favorite-card overflow-hidden rounded-xl bg-white shadow-md">
+                  <img [src]="product.image" [alt]="product.name" class="favorite-image" />
+                  <div class="favorite-body">
                     <h2 class="text-lg font-semibold text-gray-900">{{ product.name }}</h2>
                     <p class="mt-2 font-bold text-pink-500">\${{ product.price }}</p>
-                    <div class="mt-4 flex gap-3">
+                    <div class="favorite-actions flex">
                       <button type="button" (click)="moveToCart(product)" class="rounded-lg bg-pink-500 px-4 py-2 text-white">Add to cart</button>
                       <button type="button" (click)="productService.removeFromWishlist(product.id)" class="rounded-lg border border-gray-300 px-4 py-2 text-gray-700">Remove</button>
                     </div>
@@ -41,7 +41,19 @@ import { DuplicateItemDialogComponent } from '../shared/components/duplicate-ite
         }
       </div>
     </section>
-  `
+  `,
+  styles: [`
+    .favorites-view { padding: 2rem; }
+    .favorites-inner { width: 100%; }
+    .favorites-subtitle { margin-top: 0.5rem; margin-bottom: 2rem; }
+    .favorites-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
+    .favorite-card { display: flex; flex-direction: column; }
+    .favorite-image { display: block; width: 100%; height: 14rem; object-fit: cover; }
+    .favorite-body { padding: 1.25rem; }
+    .favorite-actions { gap: 0.75rem; margin-top: 1rem; flex-wrap: wrap; }
+    @media (max-width: 900px) { .favorites-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .favorites-view { padding: 1.25rem; } }
+  `]
 })
 export class FavoritesPageComponent {
   constructor(public productService: ProductService, private dialog: MatDialog) {}

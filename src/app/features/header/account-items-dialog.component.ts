@@ -48,11 +48,11 @@ export type AccountItemsDialogMode = 'favorites' | 'cart';
 
               <div class="flex flex-col gap-2">
                 @if (data.mode === 'favorites') {
-                  <button type="button" (click)="moveToCart(product)" class="rounded-lg bg-pink-500 px-3 py-1.5 text-xs font-semibold text-white">
+                  <button type="button" (click)="moveToCart(product)" class="btn rounded-lg bg-pink-500 px-3 py-1.5 text-xs font-semibold text-white">
                     Add to cart
                   </button>
                 }
-                <button type="button" (click)="remove(product.id)" class="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-700">
+                <button type="button" (click)="remove(product.id)" class="btn rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-700">
                   Remove
                 </button>
               </div>
@@ -120,7 +120,7 @@ export class AccountItemsDialogComponent {
 
   openFullPage(): void {
     this.dialogRef.close();
-    this.router.navigate([this.data.mode === 'favorites' ? '/favorites' : '/cart']);
+    this.router.navigate([this.data.mode === 'favorites' ? '/account/favorites' : '/account/cart']);
   }
 
   openCheckout(): void {

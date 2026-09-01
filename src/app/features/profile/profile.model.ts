@@ -6,6 +6,8 @@ export interface profileUser{
   lastName: string;
   sex:string;
   dob:Date | null;
+  avatarUrl?: string;
+  coverUrl?: string;
 } 
 export interface AllData{
   userProfile:profileUser | null
