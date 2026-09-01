@@ -87,8 +87,8 @@ import { GoogleMapPickerComponent, MapAddressSelection } from './google-map-pick
               <app-google-map-picker (addressSelected)="useMapAddress($event)" />
             </div>
           }
-
-          <div class="rounded-xl border border-gray-200 p-4">
+ 
+          <div class="rounded-xl border border-gray-200 p-4 mt-6">
             <p class="text-sm font-semibold text-gray-800">Payment method</p>
             <label class="mt-3 flex cursor-pointer items-center gap-3 text-sm text-gray-700">
               <input type="radio" formControlName="paymentMethod" value="card" (change)="updateCardValidation()" />
