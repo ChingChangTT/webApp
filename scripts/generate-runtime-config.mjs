@@ -6,7 +6,11 @@ const envPath = resolve(root, '.env.local');
 const outputPath = resolve(root, 'public/runtime-config.js');
 let apiKey = '';
 
-if (existsSync(envPath)) {
+// Hosting providers such as Vercel expose project variables through process.env
+// during the build. Keep .env.local as a convenient fallback for local work.
+if (process.env.GOOGLE_MAPS_API_KEY) {
+  apiKey = process.env.GOOGLE_MAPS_API_KEY.trim();
+} else if (existsSync(envPath)) {
   const line = readFileSync(envPath, 'utf8')
     .split(/\r?\n/)
     .find(entry => entry.trim().startsWith('GOOGLE_MAPS_API_KEY='));

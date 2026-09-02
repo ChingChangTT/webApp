@@ -68,7 +68,7 @@ export class GoogleMapPickerComponent implements AfterViewInit, OnDestroy {
   async ngAfterViewInit(): Promise<void> {
     const apiKey = window.__BEAUTIFO_CONFIG__?.googleMapsApiKey;
     if (!apiKey) {
-      this.errorMessage.set('Add GOOGLE_MAPS_API_KEY to .env.local, then restart the app to enable the map.');
+      this.errorMessage.set('Google Maps is not configured. Add GOOGLE_MAPS_API_KEY to the deployment environment or .env.local.');
       this.mapLoading.set(false);
       return;
     }
